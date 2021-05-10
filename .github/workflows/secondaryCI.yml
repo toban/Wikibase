@@ -59,6 +59,7 @@ jobs:
             LANG: ru
             WB: both
           php-versions: '7.3.27'
+    continue-on-error: ${{ matrix.env.MW_BRANCH == 'REL1_36' }}
     steps:
     - name: Checkout
       uses: actions/checkout@v2
