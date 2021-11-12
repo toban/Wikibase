@@ -6,9 +6,9 @@ namespace Wikibase\Repo\FederatedProperties;
 use MediaWiki\Http\HttpRequestFactory;
 use MediaWiki\Logger\LoggerFactory;
 use Wikibase\DataAccess\EntitySourceDefinitions;
-use Wikibase\DataAccess\EntitySourceLookup;
 use Wikibase\DataModel\Entity\Property;
 use Wikibase\Lib\DataTypeDefinitions;
+use Wikibase\Repo\Api\EntitySearchHelper;
 
 /**
  * @license GPL-2.0-or-later
@@ -45,11 +45,6 @@ class ApiServiceFactory {
 	private $apiEntityNamespaceInfoLookup = null;
 
 	/**
-	 * @var EntitySourceLookup
-	 */
-	private $entitySourceLookup;
-
-	/**
 	 * @var EntitySourceDefinitions
 	 */
 	private $entitySourceDefinitions;
@@ -58,7 +53,6 @@ class ApiServiceFactory {
 		HttpRequestFactory $httpRequestFactory,
 		array $contentModelMappings,
 		DataTypeDefinitions $dataTypeDefinitions,
-		EntitySourceLookup $entitySourceLookup,
 		EntitySourceDefinitions $entitySourceDefinitions,
 		string $federatedPropertiesSourceScriptUrl,
 		string $serverName
@@ -66,7 +60,6 @@ class ApiServiceFactory {
 		$this->httpRequestFactory = $httpRequestFactory;
 		$this->contentModelMappings = $contentModelMappings;
 		$this->dataTypeDefinitions = $dataTypeDefinitions;
-		$this->entitySourceLookup = $entitySourceLookup;
 		$this->entitySourceDefinitions = $entitySourceDefinitions;
 		$this->federatedPropertiesSourceScriptUrl = $federatedPropertiesSourceScriptUrl;
 		$this->serverName = $serverName;
@@ -85,11 +78,13 @@ class ApiServiceFactory {
 		);
 	}
 
-	public function newApiEntitySearchHelper(): ApiEntitySearchHelper {
-		return new ApiEntitySearchHelper(
+	public function newApiEntitySearchHelper(): EntitySearchHelper {
+		$apiSource = $this->entitySourceDefinitions->getApiSourceForEntityType( Property::ENTITY_TYPE );
+
+		return $apiSource === null ? new NullEntitySearchHelper() : new ApiEntitySearchHelper(
 			$this->newFederatedPropertiesApiClient(),
 			$this->dataTypeDefinitions->getTypeIds(),
-			$this->entitySourceDefinitions->getApiSourceForEntityType( Property::ENTITY_TYPE )
+			$apiSource
 		);
 	}
 

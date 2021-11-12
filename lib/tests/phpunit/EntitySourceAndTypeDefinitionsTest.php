@@ -6,8 +6,9 @@ namespace Wikibase\Lib\Tests;
 
 use InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
-use Wikibase\DataAccess\EntitySource;
-use Wikibase\DataAccess\Tests\NewEntitySource;
+use Wikibase\DataAccess\ApiEntitySource;
+use Wikibase\DataAccess\DatabaseEntitySource;
+use Wikibase\DataAccess\Tests\NewDatabaseEntitySource;
 use Wikibase\Lib\EntitySourceAndTypeDefinitions;
 use Wikibase\Lib\EntityTypeDefinitions;
 use Wikibase\Lib\Store\EntityArticleIdLookup;
@@ -30,22 +31,20 @@ class EntitySourceAndTypeDefinitionsTest extends TestCase {
 		};
 		$definitions = new EntitySourceAndTypeDefinitions(
 			[
-				EntitySource::TYPE_DB => new EntityTypeDefinitions( [
+				DatabaseEntitySource::TYPE => new EntityTypeDefinitions( [
 					'property' => [
 						EntityTypeDefinitions::ARTICLE_ID_LOOKUP_CALLBACK => $callback1,
 					]
 				] ),
-				EntitySource::TYPE_API => new EntityTypeDefinitions( [
+				ApiEntitySource::TYPE => new EntityTypeDefinitions( [
 					'property' => [
 						EntityTypeDefinitions::ARTICLE_ID_LOOKUP_CALLBACK => $callback2,
 					]
 				] )
 			],
 			[
-				NewEntitySource::havingName( 'local' )->build(),
-				NewEntitySource::havingName( 'wikidorta' )
-					->withType( EntitySource::TYPE_API )
-					->build(),
+				NewDatabaseEntitySource::havingName( 'local' )->build(),
+				new ApiEntitySource( 'wikidorta', [ 'property' ], '', '', '', '' )
 			]
 		);
 
@@ -76,19 +75,14 @@ class EntitySourceAndTypeDefinitionsTest extends TestCase {
 	}
 
 	public function invalidConstructorArgsProvider() {
-		yield 'source with undefined type' => [
-			'definitionsByType' => [ EntitySource::TYPE_DB => $this->createStub( EntityTypeDefinitions::class ) ],
-			'sources' => [ NewEntitySource::create()->withType( 'blergh' )->build() ],
-		];
-
 		yield 'sources param contains non-EntitySource object' => [
-			'definitionsByType' => [ EntitySource::TYPE_DB => $this->createStub( EntityTypeDefinitions::class ) ],
+			'definitionsByType' => [ DatabaseEntitySource::TYPE => $this->createStub( EntityTypeDefinitions::class ) ],
 			'sources' => [ 'i am not an entity source' ],
 		];
 
 		yield 'entityTypeDefinitionsBySourceType array contains non-EntityTypeDefinitions object' => [
-			'definitionsByType' => [ EntitySource::TYPE_DB => 'i am not an entity type def object' ],
-			'sources' => [ NewEntitySource::create()->build() ],
+			'definitionsByType' => [ DatabaseEntitySource::TYPE => 'i am not an entity type def object' ],
+			'sources' => [ NewDatabaseEntitySource::create()->build() ],
 		];
 	}
 

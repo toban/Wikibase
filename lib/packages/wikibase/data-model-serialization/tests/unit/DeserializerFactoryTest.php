@@ -5,10 +5,12 @@ namespace Tests\Wikibase\DataModel;
 use DataValues\Deserializers\DataValueDeserializer;
 use Deserializers\Deserializer;
 use PHPUnit\Framework\TestCase;
-use Wikibase\DataModel\DeserializerFactory;
+use Wikibase\DataModel\Deserializers\DeserializerFactory;
 use Wikibase\DataModel\Entity\BasicEntityIdParser;
 
 /**
+ * @covers Wikibase\DataModel\DeserializerFactory
+ *
  * @license GPL-2.0-or-later
  * @author Thomas Pellissier Tanon
  * @author Bene* < benestar.wikimedia@gmail.com >

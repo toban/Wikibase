@@ -3,14 +3,15 @@ declare( strict_types=1 );
 
 namespace Wikibase\DataAccess\Tests;
 
-use Wikibase\DataAccess\EntitySource;
+use Wikibase\DataAccess\DatabaseEntitySource;
 
 /**
- * Convenience builder for EntitySource objects in tests
+ * Convenience builder for DatabaseEntitySource objects in tests
  *
  * @license GPL-2.0-or-later
  */
-class NewEntitySource {
+
+class NewDatabaseEntitySource {
 
 	/** @var string */
 	private $name;
@@ -34,9 +35,6 @@ class NewEntitySource {
 
 	/** @var string */
 	private $interwikiPrefix;
-
-	/** @var string */
-	private $type;
 
 	public static function create(): self {
 		return new self();
@@ -102,21 +100,19 @@ class NewEntitySource {
 		return $result;
 	}
 
-	public function build(): EntitySource {
-		return new EntitySource(
+	public function build(): DatabaseEntitySource {
+		return new DatabaseEntitySource(
 			$this->name ?? '',
 			$this->dbName ?? false,
 			$this->entityNamespaceIdsAndSlots ?? [],
 			$this->conceptBaseUri ?? $this->makeRandomUri(),
 			$this->rdfNodeNamespacePrefix ?? '',
 			$this->rdfPredicateNamespacePrefix ?? '',
-			$this->interwikiPrefix ?? '',
-			$this->type ?? EntitySource::TYPE_DB
+			$this->interwikiPrefix ?? ''
 		);
 	}
 
 	private function makeRandomUri(): string {
 		return 'http://my-random-uri-' . mt_rand() . '.org/entity/';
 	}
-
 }

@@ -4,8 +4,8 @@ namespace Wikibase\Lib\Tests\Store;
 
 use PHPUnit\Framework\TestCase;
 use Wikibase\DataAccess\EntitySourceLookup;
-use Wikibase\DataAccess\Tests\NewEntitySource;
-use Wikibase\DataModel\Entity\PropertyId;
+use Wikibase\DataAccess\Tests\NewDatabaseEntitySource;
+use Wikibase\DataModel\Entity\NumericPropertyId;
 use Wikibase\Lib\ServiceBySourceAndTypeDispatcher;
 use Wikibase\Lib\Store\EntityArticleIdLookup;
 use Wikibase\Lib\Store\SourceAndTypeDispatchingArticleIdLookup;
@@ -20,13 +20,13 @@ use Wikibase\Lib\Store\SourceAndTypeDispatchingArticleIdLookup;
 class SourceAndTypeDispatchingArticleIdLookupTest extends TestCase {
 
 	public function testGivenLookupDefinedForEntityType_usesRespectiveLookup() {
-		$entityId = new PropertyId( 'P123' );
+		$entityId = new NumericPropertyId( 'P123' );
 		$articleId = 23;
 
 		$stubArticleIdLookup = $this->createStub( EntityArticleIdLookup::class );
 		$stubArticleIdLookup->method( 'getArticleId' )->willReturn( $articleId );
 		$sourceName = 'some-source-name';
-		$source = NewEntitySource::havingName( $sourceName )->build();
+		$source = NewDatabaseEntitySource::havingName( $sourceName )->build();
 
 		$dispatcher = $this->createMock( ServiceBySourceAndTypeDispatcher::class );
 		$dispatcher->expects( $this->atLeastOnce() )->method( 'getServiceForSourceAndType' )->with( $sourceName, 'property' )->willReturn(

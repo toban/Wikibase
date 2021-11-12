@@ -5,14 +5,16 @@ namespace Tests\Wikibase\DataModel;
 use DataValues\Deserializers\DataValueDeserializer;
 use DataValues\Serializers\DataValueSerializer;
 use PHPUnit\Framework\TestCase;
-use Wikibase\DataModel\DeserializerFactory;
+use Wikibase\DataModel\Deserializers\DeserializerFactory;
 use Wikibase\DataModel\Entity\BasicEntityIdParser;
-use Wikibase\DataModel\SerializerFactory;
+use Wikibase\DataModel\Serializers\SerializerFactory;
 use Wikibase\DataModel\Snak\PropertyNoValueSnak;
 use Wikibase\DataModel\Snak\PropertySomeValueSnak;
 use Wikibase\DataModel\Snak\SnakList;
 
 /**
+ * @covers DataValues\Serializers\DataValueSerializer
+ *
  * @license GPL-2.0-or-later
  * @author Jeroen De Dauw < jeroendedauw@gmail.com >
  * @author Thomas Pellissier Tanon

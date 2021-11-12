@@ -25,7 +25,9 @@ use ValueFormatters\FormatterOptions;
 use ValueFormatters\ValueFormatter;
 use ValueParsers\NullParser;
 use Wikibase\DataAccess\AliasTermBuffer;
+use Wikibase\DataAccess\ApiEntitySource;
 use Wikibase\DataAccess\DataAccessSettings;
+use Wikibase\DataAccess\DatabaseEntitySource;
 use Wikibase\DataAccess\EntitySource;
 use Wikibase\DataAccess\EntitySourceDefinitions;
 use Wikibase\DataAccess\EntitySourceDefinitionsConfigParser;
@@ -36,7 +38,7 @@ use Wikibase\DataAccess\PrefetchingTermLookup;
 use Wikibase\DataAccess\SingleEntitySourceServicesFactory;
 use Wikibase\DataAccess\SourceAndTypeDispatchingPrefetchingTermLookup;
 use Wikibase\DataAccess\WikibaseServices;
-use Wikibase\DataModel\DeserializerFactory;
+use Wikibase\DataModel\Deserializers\DeserializerFactory;
 use Wikibase\DataModel\Entity\DispatchingEntityIdParser;
 use Wikibase\DataModel\Entity\EntityIdParser;
 use Wikibase\DataModel\Entity\EntityIdParsingException;
@@ -45,7 +47,7 @@ use Wikibase\DataModel\Entity\Item;
 use Wikibase\DataModel\Entity\ItemIdParser;
 use Wikibase\DataModel\Entity\NumericPropertyId;
 use Wikibase\DataModel\Entity\Property;
-use Wikibase\DataModel\SerializerFactory;
+use Wikibase\DataModel\Serializers\SerializerFactory;
 use Wikibase\DataModel\Services\Diff\EntityDiffer;
 use Wikibase\DataModel\Services\Diff\EntityPatcher;
 use Wikibase\DataModel\Services\EntityId\EntityIdComposer;
@@ -836,9 +838,16 @@ return [
 	},
 
 	'WikibaseRepo.EntityNamespaceLookup' => function ( MediaWikiServices $services ): EntityNamespaceLookup {
-		return array_reduce(
+		$entitySources = array_filter(
 			WikibaseRepo::getEntitySourceDefinitions( $services )->getSources(),
-			function ( EntityNamespaceLookup $nsLookup, EntitySource $source ): EntityNamespaceLookup {
+			function ( EntitySource $entitySource ) {
+				return $entitySource->getType() === DatabaseEntitySource::TYPE;
+			}
+		);
+
+		return array_reduce(
+			$entitySources,
+			function ( EntityNamespaceLookup $nsLookup, DatabaseEntitySource $source ): EntityNamespaceLookup {
 				return $nsLookup->merge( new EntityNamespaceLookup(
 					$source->getEntityNamespaceIds(),
 					$source->getEntitySlotNames()
@@ -960,10 +969,10 @@ return [
 
 		$services->getHookContainer()->run( 'WikibaseRepoEntityTypes', [ &$entityTypes ] );
 
-		$entityTypeDefinitionsBySourceType = [ EntitySource::TYPE_DB => new EntityTypeDefinitions( $entityTypes ) ];
+		$entityTypeDefinitionsBySourceType = [ DatabaseEntitySource::TYPE => new EntityTypeDefinitions( $entityTypes ) ];
 
 		if ( WikibaseRepo::getSettings( $services )->getSetting( 'federatedPropertiesEnabled' ) ) {
-			$entityTypeDefinitionsBySourceType[EntitySource::TYPE_API] = new EntityTypeDefinitions(
+			$entityTypeDefinitionsBySourceType[ApiEntitySource::TYPE] = new EntityTypeDefinitions(
 				EntityTypesConfigFeddyPropsAugmenter::factory()->override( $entityTypes )
 			);
 		}
@@ -1130,7 +1139,6 @@ return [
 			$services->getHttpRequestFactory(),
 			WikibaseRepo::getContentModelMappings( $services ),
 			WikibaseRepo::getDataTypeDefinitions( $services ),
-			WikibaseRepo::getEntitySourceLookup( $services ),
 			$entitySourceDefinition,
 			$settings->getSetting( 'federatedPropertiesSourceScriptUrl' ),
 			$services->getMainConfig()->get( 'ServerName' )
@@ -2059,7 +2067,11 @@ return [
 		$singleEntitySourceServicesFactory = WikibaseRepo::getSingleEntitySourceServicesFactory( $services );
 
 		$singleSourceServices = [];
+
 		foreach ( $entitySourceDefinitions->getSources() as $source ) {
+			if ( $source->getType() === ApiEntitySource::TYPE ) {
+				continue;
+			}
 			$singleSourceServices[$source->getSourceName()] = $singleEntitySourceServicesFactory
 				->getServicesForSource( $source );
 		}

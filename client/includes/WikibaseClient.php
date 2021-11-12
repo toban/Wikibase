@@ -27,14 +27,14 @@ use Wikibase\Client\Store\DescriptionLookup;
 use Wikibase\Client\Usage\UsageAccumulatorFactory;
 use Wikibase\DataAccess\AliasTermBuffer;
 use Wikibase\DataAccess\DataAccessSettings;
-use Wikibase\DataAccess\EntitySource;
+use Wikibase\DataAccess\DatabaseEntitySource;
 use Wikibase\DataAccess\EntitySourceDefinitions;
 use Wikibase\DataAccess\PrefetchingTermLookup;
 use Wikibase\DataAccess\SingleEntitySourceServicesFactory;
 use Wikibase\DataAccess\WikibaseServices;
-use Wikibase\DataModel\DeserializerFactory;
+use Wikibase\DataModel\Deserializers\DeserializerFactory;
 use Wikibase\DataModel\Entity\EntityIdParser;
-use Wikibase\DataModel\SerializerFactory;
+use Wikibase\DataModel\Serializers\SerializerFactory;
 use Wikibase\DataModel\Services\Diff\EntityDiffer;
 use Wikibase\DataModel\Services\EntityId\EntityIdComposer;
 use Wikibase\DataModel\Services\Lookup\EntityLookup;
@@ -427,7 +427,7 @@ final class WikibaseClient {
 			->get( 'WikibaseClient.ExternalUserNames' );
 	}
 
-	public static function getItemAndPropertySource( ContainerInterface $services = null ): EntitySource {
+	public static function getItemAndPropertySource( ContainerInterface $services = null ): DatabaseEntitySource {
 		return ( $services ?: MediaWikiServices::getInstance() )
 			->get( 'WikibaseClient.ItemAndPropertySource' );
 	}
@@ -490,12 +490,12 @@ final class WikibaseClient {
 			->get( 'WikibaseClient.ReferenceFormatterFactory' );
 	}
 
-	public static function getItemSource( ContainerInterface $services = null ): EntitySource {
+	public static function getItemSource( ContainerInterface $services = null ): DatabaseEntitySource {
 		return ( $services ?: MediaWikiServices::getInstance() )
 			->get( 'WikibaseClient.ItemSource' );
 	}
 
-	public static function getPropertySource( ContainerInterface $services = null ): EntitySource {
+	public static function getPropertySource( ContainerInterface $services = null ): DatabaseEntitySource {
 		return ( $services ?: MediaWikiServices::getInstance() )
 			->get( 'WikibaseClient.PropertySource' );
 	}

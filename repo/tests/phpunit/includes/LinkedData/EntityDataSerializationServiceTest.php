@@ -8,7 +8,7 @@ use DataValues\Serializers\DataValueSerializer;
 use HashSiteStore;
 use MediaWikiIntegrationTestCase;
 use Title;
-use Wikibase\DataAccess\EntitySource;
+use Wikibase\DataAccess\DatabaseEntitySource;
 use Wikibase\DataAccess\EntitySourceDefinitions;
 use Wikibase\DataAccess\Tests\InMemoryPrefetchingTermLookup;
 use Wikibase\DataModel\Entity\EntityId;
@@ -18,7 +18,7 @@ use Wikibase\DataModel\Entity\Item;
 use Wikibase\DataModel\Entity\ItemId;
 use Wikibase\DataModel\Entity\NumericPropertyId;
 use Wikibase\DataModel\Entity\Property;
-use Wikibase\DataModel\SerializerFactory;
+use Wikibase\DataModel\Serializers\SerializerFactory;
 use Wikibase\DataModel\Services\Lookup\PropertyDataTypeLookup;
 use Wikibase\DataModel\Services\Lookup\PropertyDataTypeLookupException;
 use Wikibase\DataModel\Snak\PropertyValueSnak;
@@ -119,7 +119,7 @@ class EntityDataSerializationServiceTest extends MediaWikiIntegrationTestCase {
 				[ 'items' => self::URI_BASE, 'props' => self::URI_BASE_PROPS, ],
 				[ 'items' => self::URI_DATA, 'props' => self::URI_DATA_PROPS, ],
 				new EntitySourceDefinitions( [
-					new EntitySource(
+					new DatabaseEntitySource(
 						'items',
 						'itemdb',
 						[ 'item' => [ 'namespaceId' => 100, 'slot' => 'main' ] ],
@@ -128,7 +128,7 @@ class EntityDataSerializationServiceTest extends MediaWikiIntegrationTestCase {
 						'',
 						'i'
 					),
-					new EntitySource(
+					new DatabaseEntitySource(
 						'props',
 						'propdb',
 						[ 'property' => [ 'namespaceId' => 600, 'slot' => 'main' ] ],

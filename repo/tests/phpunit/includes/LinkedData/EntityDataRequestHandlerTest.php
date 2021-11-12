@@ -16,11 +16,11 @@ use OutputPage;
 use Psr\Log\NullLogger;
 use RequestContext;
 use Title;
-use Wikibase\DataAccess\EntitySource;
+use Wikibase\DataAccess\DatabaseEntitySource;
 use Wikibase\DataAccess\EntitySourceDefinitions;
 use Wikibase\DataModel\Entity\EntityId;
 use Wikibase\DataModel\Entity\ItemId;
-use Wikibase\DataModel\SerializerFactory;
+use Wikibase\DataModel\Serializers\SerializerFactory;
 use Wikibase\DataModel\Services\Lookup\InMemoryDataTypeLookup;
 use Wikibase\DataModel\Services\Lookup\PropertyDataTypeLookup;
 use Wikibase\Lib\Store\EntityRevisionLookup;
@@ -131,7 +131,7 @@ class EntityDataRequestHandlerTest extends MediaWikiIntegrationTestCase {
 				[ 'test' => EntityDataSerializationServiceTest::URI_BASE ],
 				[ 'test' => EntityDataSerializationServiceTest::URI_DATA ],
 				new EntitySourceDefinitions( [
-					new EntitySource(
+					new DatabaseEntitySource(
 						'test',
 						'testdb',
 						[ 'item' => [ 'namespaceId' => 1200, 'slot' => 'main' ] ],

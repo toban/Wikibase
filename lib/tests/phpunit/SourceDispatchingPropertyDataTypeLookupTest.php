@@ -7,8 +7,8 @@ namespace Wikibase\Lib\Tests;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Wikibase\DataAccess\EntitySourceLookup;
-use Wikibase\DataAccess\Tests\NewEntitySource;
-use Wikibase\DataModel\Entity\PropertyId;
+use Wikibase\DataAccess\Tests\NewDatabaseEntitySource;
+use Wikibase\DataModel\Entity\NumericPropertyId;
 use Wikibase\DataModel\Services\Lookup\PropertyDataTypeLookup;
 use Wikibase\Lib\ServiceBySourceAndTypeDispatcher;
 use Wikibase\Lib\SourceDispatchingPropertyDataTypeLookup;
@@ -40,7 +40,7 @@ class SourceDispatchingPropertyDataTypeLookupTest extends TestCase {
 	}
 
 	public function testGivenEntityDataTypeLookupDefinedForEntitySource_usesRespectiveEntityDataTypeLookup(): void {
-		$propertyId = new PropertyId( 'P321' );
+		$propertyId = new NumericPropertyId( 'P321' );
 		$dataTypeId = 'wikibase-schmentity';
 		$propertySourceName = 'schmentitySource';
 
@@ -61,7 +61,7 @@ class SourceDispatchingPropertyDataTypeLookupTest extends TestCase {
 		$this->entitySourceLookup->expects( $this->atLeastOnce() )
 			->method( 'getEntitySourceById' )
 			->with( $propertyId )
-			->willReturn( NewEntitySource::havingName( $propertySourceName )->build() );
+			->willReturn( NewDatabaseEntitySource::havingName( $propertySourceName )->build() );
 
 		$this->assertSame( $dataTypeId, $this->newDispatchingPropertyDataTypeLookup()->getDataTypeIdForProperty( $propertyId ) );
 	}

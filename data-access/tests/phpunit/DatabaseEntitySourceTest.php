@@ -4,16 +4,16 @@ namespace Wikibase\DataAccess\Tests;
 
 use InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
-use Wikibase\DataAccess\EntitySource;
+use Wikibase\DataAccess\DatabaseEntitySource;
 
 /**
- * @covers \Wikibase\DataAccess\EntitySource
+ * @covers \Wikibase\DataAccess\DatabaseEntitySource
  *
  * @group Wikibase
  *
  * @license GPL-2.0-or-later
  */
-class EntitySourceTest extends TestCase {
+class DatabaseEntitySourceTest extends TestCase {
 
 	/**
 	 * @dataProvider provideInvalidConstructorArguments
@@ -28,7 +28,7 @@ class EntitySourceTest extends TestCase {
 		$interwikiPrefix
 	) {
 		$this->expectException( InvalidArgumentException::class );
-		new EntitySource(
+		new DatabaseEntitySource(
 			$slotName,
 			$databaseName,
 			$entityNamespaceIdsAndSlots,
@@ -171,7 +171,7 @@ class EntitySourceTest extends TestCase {
 	}
 
 	public function testGetEntityTypes() {
-		$source = new EntitySource(
+		$source = new DatabaseEntitySource(
 			'test',
 			'foodb',
 			[ 'item' => [ 'namespaceId' => 100, 'slot' => 'main' ], 'property' => [ 'namespaceId' => 200, 'slot' => 'main' ] ],
@@ -185,7 +185,7 @@ class EntitySourceTest extends TestCase {
 	}
 
 	public function testGetEntityNamespaceIds() {
-		$source = new EntitySource(
+		$source = new DatabaseEntitySource(
 			'test',
 			'foodb',
 			[ 'item' => [ 'namespaceId' => 100, 'slot' => 'main' ], 'property' => [ 'namespaceId' => 200, 'slot' => 'main' ] ],
@@ -199,7 +199,7 @@ class EntitySourceTest extends TestCase {
 	}
 
 	public function testGetEntitySlotNames() {
-		$source = new EntitySource(
+		$source = new DatabaseEntitySource(
 			'test',
 			'foodb',
 			[ 'item' => [ 'namespaceId' => 100, 'slot' => 'main' ], 'property' => [ 'namespaceId' => 200, 'slot' => 'other' ] ],
@@ -213,17 +213,16 @@ class EntitySourceTest extends TestCase {
 	}
 
 	public function testGetType() {
-		$source = new EntitySource(
+		$source = new DatabaseEntitySource(
 			'test',
 			'foodb',
 			[ 'item' => [ 'namespaceId' => 100, 'slot' => 'main' ], 'property' => [ 'namespaceId' => 200, 'slot' => 'other' ] ],
 			'concept:',
 			'wd',
 			'',
-			'testwiki',
-			EntitySource::TYPE_API
+			'testwiki'
 		);
-		$this->assertEquals( EntitySource::TYPE_API, $source->getType() );
+		$this->assertEquals( DatabaseEntitySource::TYPE, $source->getType() );
 	}
 
 }

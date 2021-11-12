@@ -48,6 +48,7 @@ use Wikibase\Client\WikibaseClient;
 use Wikibase\DataAccess\AliasTermBuffer;
 use Wikibase\DataAccess\ByTypeDispatchingEntityIdLookup;
 use Wikibase\DataAccess\DataAccessSettings;
+use Wikibase\DataAccess\DatabaseEntitySource;
 use Wikibase\DataAccess\EntitySource;
 use Wikibase\DataAccess\EntitySourceDefinitions;
 use Wikibase\DataAccess\EntitySourceDefinitionsConfigParser;
@@ -58,14 +59,14 @@ use Wikibase\DataAccess\Serializer\ForbiddenSerializer;
 use Wikibase\DataAccess\SingleEntitySourceServicesFactory;
 use Wikibase\DataAccess\SourceAndTypeDispatchingPrefetchingTermLookup;
 use Wikibase\DataAccess\WikibaseServices;
-use Wikibase\DataModel\DeserializerFactory;
+use Wikibase\DataModel\Deserializers\DeserializerFactory;
 use Wikibase\DataModel\Entity\DispatchingEntityIdParser;
 use Wikibase\DataModel\Entity\EntityIdParser;
 use Wikibase\DataModel\Entity\EntityIdValue;
 use Wikibase\DataModel\Entity\Item;
 use Wikibase\DataModel\Entity\ItemIdParser;
 use Wikibase\DataModel\Entity\Property;
-use Wikibase\DataModel\SerializerFactory;
+use Wikibase\DataModel\Serializers\SerializerFactory;
 use Wikibase\DataModel\Services\Diff\EntityDiffer;
 use Wikibase\DataModel\Services\EntityId\EntityIdComposer;
 use Wikibase\DataModel\Services\EntityId\SuffixEntityIdParser;
@@ -399,7 +400,7 @@ return [
 	'WikibaseClient.EntityNamespaceLookup' => function ( MediaWikiServices $services ): EntityNamespaceLookup {
 		return array_reduce(
 			WikibaseClient::getEntitySourceDefinitions( $services )->getSources(),
-			function ( EntityNamespaceLookup $nsLookup, EntitySource $source ): EntityNamespaceLookup {
+			function ( EntityNamespaceLookup $nsLookup, DatabaseEntitySource $source ): EntityNamespaceLookup {
 				return $nsLookup->merge( new EntityNamespaceLookup(
 					$source->getEntityNamespaceIds(),
 					$source->getEntitySlotNames()
@@ -413,7 +414,7 @@ return [
 		// note: when adding support for further entity source types here,
 		// also adjust the default 'entitySources' setting to copy sources of those types from the repo
 		return new EntitySourceAndTypeDefinitions(
-			[ EntitySource::TYPE_DB => WikibaseClient::getEntityTypeDefinitions( $services ) ],
+			[ DatabaseEntitySource::TYPE => WikibaseClient::getEntityTypeDefinitions( $services ) ],
 			WikibaseClient::getEntitySourceDefinitions( $services )->getSources()
 		);
 	},

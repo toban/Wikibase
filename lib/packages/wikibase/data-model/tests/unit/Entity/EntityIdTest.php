@@ -6,12 +6,13 @@ use InvalidArgumentException;
 use ReflectionClass;
 use Wikibase\DataModel\Entity\EntityId;
 use Wikibase\DataModel\Entity\ItemId;
-use Wikibase\DataModel\Entity\PropertyId;
+use Wikibase\DataModel\Entity\NumericPropertyId;
+use Wikibase\DataModel\Entity\SerializableEntityId;
 
 /**
  * @covers \Wikibase\DataModel\Entity\EntityId
  * @uses \Wikibase\DataModel\Entity\ItemId
- * @uses \Wikibase\DataModel\Entity\PropertyId
+ * @uses \Wikibase\DataModel\Entity\NumericPropertyId
  *
  * @group Wikibase
  * @group WikibaseDataModel
@@ -31,8 +32,8 @@ class EntityIdTest extends \PHPUnit\Framework\TestCase {
 		$ids[] = [ new ItemId( 'Q2147483647' ), '' ];
 		$ids[] = [ new ItemId( ':Q2147483647' ), '' ];
 		$ids[] = [ new ItemId( 'foo:Q2147483647' ), 'foo' ];
-		$ids[] = [ new PropertyId( 'P101010' ), '' ];
-		$ids[] = [ new PropertyId( 'foo:bar:P101010' ), 'foo' ];
+		$ids[] = [ new NumericPropertyId( 'P101010' ), '' ];
+		$ids[] = [ new NumericPropertyId( 'foo:bar:P101010' ), 'foo' ];
 
 		return $ids;
 	}
@@ -89,8 +90,8 @@ class EntityIdTest extends \PHPUnit\Framework\TestCase {
 		$this->assertFalse( ( new ItemId( 'Q42' ) )->isForeign() );
 		$this->assertFalse( ( new ItemId( ':Q42' ) )->isForeign() );
 		$this->assertTrue( ( new ItemId( 'foo:Q42' ) )->isForeign() );
-		$this->assertFalse( ( new PropertyId( ':P42' ) )->isForeign() );
-		$this->assertTrue( ( new PropertyId( 'foo:P42' ) )->isForeign() );
+		$this->assertFalse( ( new NumericPropertyId( ':P42' ) )->isForeign() );
+		$this->assertTrue( ( new NumericPropertyId( 'foo:P42' ) )->isForeign() );
 	}
 
 	/**
@@ -113,7 +114,7 @@ class EntityIdTest extends \PHPUnit\Framework\TestCase {
 	 * @dataProvider serializationSplitProvider
 	 */
 	public function testSplitSerialization( $serialization, $split ) {
-		$this->assertSame( $split, EntityId::splitSerialization( $serialization ) );
+		$this->assertSame( $split, SerializableEntityId::splitSerialization( $serialization ) );
 	}
 
 	/**
@@ -121,14 +122,14 @@ class EntityIdTest extends \PHPUnit\Framework\TestCase {
 	 */
 	public function testSplitSerializationFails_GivenInvalidSerialization( $serialization ) {
 		$this->expectException( InvalidArgumentException::class );
-		EntityId::splitSerialization( $serialization );
+		SerializableEntityId::splitSerialization( $serialization );
 	}
 
 	/**
 	 * @dataProvider serializationSplitProvider
 	 */
 	public function testJoinSerialization( $serialization, $split ) {
-		$this->assertSame( $serialization, EntityId::joinSerialization( $split ) );
+		$this->assertSame( $serialization, SerializableEntityId::joinSerialization( $split ) );
 	}
 
 	/**
@@ -136,7 +137,7 @@ class EntityIdTest extends \PHPUnit\Framework\TestCase {
 	 */
 	public function testJoinSerializationFails_GivenEmptyId( $parts ) {
 		$this->expectException( InvalidArgumentException::class );
-		EntityId::joinSerialization( $parts );
+		SerializableEntityId::joinSerialization( $parts );
 	}
 
 	public function invalidJoinSerializationDataProvider() {
@@ -148,8 +149,8 @@ class EntityIdTest extends \PHPUnit\Framework\TestCase {
 	}
 
 	public function testGivenNotNormalizedSerialization_splitSerializationReturnsNormalizedParts() {
-		$this->assertSame( [ '', '', 'Q42' ], EntityId::splitSerialization( ':Q42' ) );
-		$this->assertSame( [ 'foo', 'bar', 'Q42' ], EntityId::splitSerialization( ':foo:bar:Q42' ) );
+		$this->assertSame( [ '', '', 'Q42' ], SerializableEntityId::splitSerialization( ':Q42' ) );
+		$this->assertSame( [ 'foo', 'bar', 'Q42' ], SerializableEntityId::splitSerialization( ':foo:bar:Q42' ) );
 	}
 
 	public function localPartDataProvider() {
@@ -184,9 +185,9 @@ class EntityIdTest extends \PHPUnit\Framework\TestCase {
 	 * @dataProvider invalidSerializationProvider
 	 */
 	public function testConstructor( $serialization ) {
-		$mock = $this->createMock( EntityId::class );
+		$mock = $this->createMock( SerializableEntityId::class );
 
-		$constructor = ( new ReflectionClass( EntityId::class ) )->getConstructor();
+		$constructor = ( new ReflectionClass( SerializableEntityId::class ) )->getConstructor();
 
 		$this->expectException( InvalidArgumentException::class );
 		$constructor->invoke( $mock, $serialization );

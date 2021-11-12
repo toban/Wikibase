@@ -7,7 +7,7 @@ use Deserializers\Exceptions\DeserializationException;
 use Wikibase\DataModel\Entity\BasicEntityIdParser;
 use Wikibase\DataModel\Entity\EntityId;
 use Wikibase\DataModel\Entity\ItemId;
-use Wikibase\DataModel\Entity\PropertyId;
+use Wikibase\DataModel\Entity\NumericPropertyId;
 use Wikibase\InternalSerialization\Deserializers\LegacyEntityIdDeserializer;
 
 /**
@@ -23,17 +23,17 @@ class LegacyEntityIdDeserializerTest extends \PHPUnit\Framework\TestCase {
 	 */
 	private $deserializer;
 
-	protected function setUp() : void {
+	protected function setUp(): void {
 		$this->deserializer = new LegacyEntityIdDeserializer( new BasicEntityIdParser() );
 	}
 
 	public function invalidSerializationProvider() {
-		return array(
-			array( null ),
-			array( 42 ),
-			array( array() ),
-			array( array( 'Q42' ) ),
-		);
+		return [
+			[ null ],
+			[ 42 ],
+			[ [] ],
+			[ [ 'Q42' ] ],
+		];
 	}
 
 	/**
@@ -57,17 +57,17 @@ class LegacyEntityIdDeserializerTest extends \PHPUnit\Framework\TestCase {
 	}
 
 	public function legacyIdProvider() {
-		return array(
-			array(
+		return [
+			[
 				new ItemId( 'Q42' ),
-				array( 'item', 42 )
-			),
+				[ 'item', 42 ]
+			],
 
-			array(
-				new PropertyId( 'P1337' ),
-				array( 'property', 1337 )
-			),
-		);
+			[
+				new NumericPropertyId( 'P1337' ),
+				[ 'property', 1337 ]
+			],
+		];
 	}
 
 	/**
@@ -79,12 +79,12 @@ class LegacyEntityIdDeserializerTest extends \PHPUnit\Framework\TestCase {
 	}
 
 	public function newIdProvider() {
-		return array(
-			array( new ItemId( 'Q1' ), 'Q1' ),
-			array( new ItemId( 'Q42' ), 'q42' ),
-			array( new PropertyId( 'P1337' ), 'P1337' ),
-			array( new PropertyId( 'P23' ), 'p23' ),
-		);
+		return [
+			[ new ItemId( 'Q1' ), 'Q1' ],
+			[ new ItemId( 'Q42' ), 'q42' ],
+			[ new NumericPropertyId( 'P1337' ), 'P1337' ],
+			[ new NumericPropertyId( 'P23' ), 'p23' ],
+		];
 	}
 
 	public function testGivenInvalidNewIdFormat_exceptionIsThrown() {
@@ -94,23 +94,23 @@ class LegacyEntityIdDeserializerTest extends \PHPUnit\Framework\TestCase {
 
 	public function testGivenInvalidLegacyIdFormat_exceptionIsThrown() {
 		$this->expectDeserializationException();
-		$this->deserializer->deserialize( array( 'item', 'foobar' ) );
+		$this->deserializer->deserialize( [ 'item', 'foobar' ] );
 	}
 
 	public function testGivenArrayWithTwoStringKeys_exceptionIsThrown() {
 		$this->expectDeserializationException();
-		$this->deserializer->deserialize( array(
+		$this->deserializer->deserialize( [
 			'foo' => 'item',
 			'baz' => 42,
-		) );
+		] );
 	}
 
 	public function testGivenArrayWithWrongNumericKeys_exceptionIsThrown() {
 		$this->expectDeserializationException();
-		$this->deserializer->deserialize( array(
+		$this->deserializer->deserialize( [
 			42 => 'item',
 			1337 => 42,
-		) );
+		] );
 	}
 
 }

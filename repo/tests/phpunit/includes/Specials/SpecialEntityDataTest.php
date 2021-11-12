@@ -16,10 +16,10 @@ use Psr\Log\NullLogger;
 use SpecialPage;
 use SpecialPageTestBase;
 use Title;
-use Wikibase\DataAccess\EntitySource;
+use Wikibase\DataAccess\DatabaseEntitySource;
 use Wikibase\DataAccess\EntitySourceDefinitions;
 use Wikibase\DataModel\Entity\EntityId;
-use Wikibase\DataModel\SerializerFactory;
+use Wikibase\DataModel\Serializers\SerializerFactory;
 use Wikibase\DataModel\Services\Lookup\PropertyDataTypeLookup;
 use Wikibase\Lib\SubEntityTypesMapper;
 use Wikibase\Repo\Content\EntityContentFactory;
@@ -100,7 +100,7 @@ class SpecialEntityDataTest extends SpecialPageTestBase {
 				[ 'test' => self::URI_BASE ],
 				[ 'test' => self::URI_DATA ],
 				new EntitySourceDefinitions( [
-					new EntitySource(
+					new DatabaseEntitySource(
 						'test',
 						'testdb',
 						[ 'item' => [ 'namespaceId' => 123, 'slot' => 'main' ] ],

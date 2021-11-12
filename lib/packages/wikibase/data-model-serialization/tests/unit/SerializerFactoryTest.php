@@ -11,7 +11,7 @@ use Wikibase\DataModel\Entity\Item;
 use Wikibase\DataModel\Entity\Property;
 use Wikibase\DataModel\Reference;
 use Wikibase\DataModel\ReferenceList;
-use Wikibase\DataModel\SerializerFactory;
+use Wikibase\DataModel\Serializers\SerializerFactory;
 use Wikibase\DataModel\SiteLink;
 use Wikibase\DataModel\Snak\PropertyNoValueSnak;
 use Wikibase\DataModel\Snak\SnakList;
@@ -24,6 +24,8 @@ use Wikibase\DataModel\Term\Term;
 use Wikibase\DataModel\Term\TermList;
 
 /**
+ * @covers Wikibase\DataModel\SerializerFactory
+ *
  * @license GPL-2.0-or-later
  * @author Thomas Pellissier Tanon
  * @author Bene* < benestar.wikimedia@gmail.com >

@@ -6,12 +6,12 @@ namespace Wikibase\DataAccess\Tests;
 
 use LogicException;
 use PHPUnit\Framework\TestCase;
-use Wikibase\DataAccess\EntitySource;
+use Wikibase\DataAccess\ApiEntitySource;
 use Wikibase\DataAccess\EntitySourceDefinitions;
 use Wikibase\DataAccess\EntitySourceLookup;
 use Wikibase\DataModel\Entity\EntityId;
 use Wikibase\DataModel\Entity\ItemId;
-use Wikibase\DataModel\Entity\PropertyId;
+use Wikibase\DataModel\Entity\NumericPropertyId;
 use Wikibase\Lib\FederatedProperties\FederatedPropertyId;
 use Wikibase\Lib\SubEntityTypesMapper;
 
@@ -25,14 +25,18 @@ use Wikibase\Lib\SubEntityTypesMapper;
 class EntitySourceLookupTest extends TestCase {
 
 	public function testGivenUriEntityId_returnsEntitySourceWithMatchingConceptUri() {
-		$expectedSource = NewEntitySource::create()
-			->withConceptBaseUri( 'http://wikidata.org/entity/' )
-			->withType( EntitySource::TYPE_API )
-			->build();
+		$expectedSource = new ApiEntitySource(
+			'feddy-props',
+			[ 'property' ],
+			'http://wikidata.org/entity/',
+			'',
+			'',
+			''
+		);
 		$entityId = new FederatedPropertyId( 'http://wikidata.org/entity/P123', 'P123' );
 
 		$lookup = new EntitySourceLookup( $this->newEntitySourceDefinitionsFromSources( [
-			NewEntitySource::havingName( 'some other source' )->build(),
+			NewDatabaseEntitySource::havingName( 'some other source' )->build(),
 			$expectedSource,
 		] ), new SubEntityTypesMapper( [] ) );
 
@@ -40,13 +44,13 @@ class EntitySourceLookupTest extends TestCase {
 	}
 
 	public function testGivenUnprefixedEntityId_returnsDbEntitySourceForEntityType() {
-		$id = new PropertyId( 'P123' );
-		$expectedSource = NewEntitySource::havingName( 'im a db source!' )
+		$id = new NumericPropertyId( 'P123' );
+		$expectedSource = NewDatabaseEntitySource::havingName( 'im a db source!' )
 			->withEntityNamespaceIdsAndSlots( [ 'property' => [ 'namespaceId' => 121, 'slot' => 'main' ] ] )
 			->build();
 
 		$lookup = new EntitySourceLookup( $this->newEntitySourceDefinitionsFromSources( [
-			NewEntitySource::havingName( 'some other source' )->build(),
+			NewDatabaseEntitySource::havingName( 'some other source' )->build(),
 			$expectedSource,
 		] ), new SubEntityTypesMapper( [] ) );
 
@@ -55,7 +59,7 @@ class EntitySourceLookupTest extends TestCase {
 
 	public function testGivenEntityIdWithNoMatchingSource_throwsException() {
 		$lookup = new EntitySourceLookup( $this->newEntitySourceDefinitionsFromSources( [
-			NewEntitySource::havingName( 'im a property source' )
+			NewDatabaseEntitySource::havingName( 'im a property source' )
 				->withEntityNamespaceIdsAndSlots( [ 'property' => [ 'namespaceId' => 121, 'slot' => 'main' ] ] )
 				->build(),
 		] ), new SubEntityTypesMapper( [] ) );
@@ -66,13 +70,13 @@ class EntitySourceLookupTest extends TestCase {
 	}
 
 	public function testGivenUriEntityId_WithMatchingConceptUri_ButWithDBEntitySource_throws() {
-		$expectedSource = NewEntitySource::havingName( 'expected source' )
+		$expectedSource = NewDatabaseEntitySource::havingName( 'expected source' )
 			->withConceptBaseUri( 'http://wikidata.org/entity/' )
 			->build();
 		$entityId = new FederatedPropertyId( 'http://wikidata.org/entity/P123', 'P123' );
 
 		$lookup = new EntitySourceLookup( $this->newEntitySourceDefinitionsFromSources( [
-			NewEntitySource::havingName( 'some other source' )->build(),
+			NewDatabaseEntitySource::havingName( 'some other source' )->build(),
 			$expectedSource,
 		] ), new SubEntityTypesMapper( [] ) );
 
@@ -85,13 +89,13 @@ class EntitySourceLookupTest extends TestCase {
 		$subEntityId->method( 'getSerialization' )->willReturn( 'L123-F123' );
 		$subEntityId->method( 'getEntityType' )->willReturn( 'form' );
 
-		$expectedSource = NewEntitySource::havingName( 'lexeme source' )
+		$expectedSource = NewDatabaseEntitySource::havingName( 'lexeme source' )
 			->withEntityNamespaceIdsAndSlots( [ 'lexeme' => [ 'namespaceId' => 121, 'slot' => 'main' ] ] )
 			->build();
 
 		$lookup = new EntitySourceLookup(
 			$this->newEntitySourceDefinitionsFromSources( [
-				NewEntitySource::havingName( 'some other source' )->build(),
+				NewDatabaseEntitySource::havingName( 'some other source' )->build(),
 				$expectedSource,
 			] ),
 			new SubEntityTypesMapper( [ 'lexeme' => [ 'form', 'sense' ] ] )

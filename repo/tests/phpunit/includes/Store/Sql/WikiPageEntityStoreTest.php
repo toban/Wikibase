@@ -15,7 +15,7 @@ use Serializers\Serializer;
 use Status;
 use Title;
 use User;
-use Wikibase\DataAccess\EntitySource;
+use Wikibase\DataAccess\DatabaseEntitySource;
 use Wikibase\DataModel\Entity\EntityDocument;
 use Wikibase\DataModel\Entity\EntityId;
 use Wikibase\DataModel\Entity\EntityRedirect;
@@ -23,6 +23,7 @@ use Wikibase\DataModel\Entity\Item;
 use Wikibase\DataModel\Entity\ItemId;
 use Wikibase\DataModel\Entity\NumericPropertyId;
 use Wikibase\DataModel\Entity\Property;
+use Wikibase\DataModel\Entity\SerializableEntityId;
 use Wikibase\DataModel\Services\EntityId\EntityIdComposer;
 use Wikibase\DataModel\Services\Lookup\TermLookupException;
 use Wikibase\Lib\Store\EntityRevisionLookup;
@@ -79,7 +80,7 @@ class WikiPageEntityStoreTest extends MediaWikiIntegrationTestCase {
 	 * @return EntityId
 	 */
 	private function newCustomEntityId( $idString ) {
-		$id = $this->getMockBuilder( EntityId::class )
+		$id = $this->getMockBuilder( SerializableEntityId::class )
 			->setConstructorArgs( [ $idString ] )
 			->onlyMethods( [ 'getEntityType', 'serialize', 'unserialize' ] )
 			->getMock();
@@ -99,7 +100,7 @@ class WikiPageEntityStoreTest extends MediaWikiIntegrationTestCase {
 
 		$nsLookup = WikibaseRepo::getEntityNamespaceLookup();
 
-		$localSource = new EntitySource(
+		$localSource = new DatabaseEntitySource(
 			'local',
 			false,
 			[ 'item' => [ 'namespaceId' => 5000, 'slot' => 'main' ], 'property' => [ 'namespaceId' => 6000, 'slot' => 'main' ] ],
@@ -774,7 +775,7 @@ class WikiPageEntityStoreTest extends MediaWikiIntegrationTestCase {
 			$this->prophesize( IdGenerator::class )->reveal(),
 			$this->prophesize( EntityIdComposer::class )->reveal(),
 			$this->prophesize( RevisionStore::class )->reveal(),
-			new EntitySource( 'test', 'testdb', [], '', '', '', '' ),
+			new DatabaseEntitySource( 'test', 'testdb', [], '', '', '', '' ),
 			MediaWikiServices::getInstance()->getPermissionManager(),
 			MediaWikiServices::getInstance()->getWatchlistManager(),
 			$this->getRepoDomainDb( $this->db )
@@ -981,7 +982,7 @@ class WikiPageEntityStoreTest extends MediaWikiIntegrationTestCase {
 	}
 
 	private function createStoreForItemsOnly() {
-		$itemSource = new EntitySource(
+		$itemSource = new DatabaseEntitySource(
 			'local',
 			false,
 			[ 'item' => [ 'namespaceId' => 5000, 'slot' => 'main' ] ],
@@ -1021,7 +1022,7 @@ class WikiPageEntityStoreTest extends MediaWikiIntegrationTestCase {
 	}
 
 	private function createStoreForCustomEntitySource() {
-		$customSource = new EntitySource(
+		$customSource = new DatabaseEntitySource(
 			'custom',
 			'customdb',
 			[ 'custom-type' => [ 'namespaceId' => 666, 'slot' => 'main' ] ],

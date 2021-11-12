@@ -15,10 +15,10 @@
  * @author Bene* < benestar.wikimedia@gmail.com >
  */
 
-use Wikibase\DataModel\DeserializerFactory;
+use Wikibase\DataModel\Deserializers\DeserializerFactory;
 use Wikibase\DataModel\Entity\ItemId;
-use Wikibase\DataModel\Entity\PropertyId;
-use Wikibase\DataModel\SerializerFactory;
+use Wikibase\DataModel\Entity\NumericPropertyId;
+use Wikibase\DataModel\Serializers\SerializerFactory;
 use Wikibase\DataModel\Services\Diff\ItemDiffer;
 use Wikibase\DataModel\Services\Diff\ItemPatcher;
 use Wikibase\DataModel\Services\Diff\PropertyDiffer;
@@ -54,12 +54,12 @@ return [
 		Def::DESERIALIZER_FACTORY_CALLBACK => function( DeserializerFactory $deserializerFactory ) {
 			return $deserializerFactory->newPropertyDeserializer();
 		},
-		Def::ENTITY_ID_PATTERN => PropertyId::PATTERN,
+		Def::ENTITY_ID_PATTERN => NumericPropertyId::PATTERN,
 		Def::ENTITY_ID_BUILDER => function( $serialization ) {
-			return new PropertyId( $serialization );
+			return new NumericPropertyId( $serialization );
 		},
 		Def::ENTITY_ID_COMPOSER_CALLBACK => function( $repositoryName, $uniquePart ) {
-			return PropertyId::newFromRepositoryAndNumber( $repositoryName, $uniquePart );
+			return NumericPropertyId::newFromRepositoryAndNumber( $repositoryName, $uniquePart );
 		},
 		Def::ENTITY_DIFFER_STRATEGY_BUILDER => function() {
 			return new PropertyDiffer();

@@ -6,8 +6,8 @@ namespace Wikibase\Lib\Tests\Store;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Wikibase\DataAccess\EntitySourceLookup;
-use Wikibase\DataAccess\Tests\NewEntitySource;
-use Wikibase\DataModel\Entity\PropertyId;
+use Wikibase\DataAccess\Tests\NewDatabaseEntitySource;
+use Wikibase\DataModel\Entity\NumericPropertyId;
 use Wikibase\Lib\ServiceBySourceAndTypeDispatcher;
 use Wikibase\Lib\Store\EntityTitleTextLookup;
 use Wikibase\Lib\Store\SourceAndTypeDispatchingTitleTextLookup;
@@ -39,7 +39,7 @@ class SourceAndTypeDispatchingTitleTextLookupTest extends TestCase {
 	}
 
 	public function testGivenLookupDefinedForEntityType_usesRespectiveLookup(): void {
-		$entityId = new PropertyId( 'P321' );
+		$entityId = new NumericPropertyId( 'P321' );
 		$titleText = 'Property:P321';
 		$propertySourceName = 'propertySource';
 
@@ -55,7 +55,7 @@ class SourceAndTypeDispatchingTitleTextLookupTest extends TestCase {
 		$this->entitySourceLookup->expects( $this->atLeastOnce() )
 			->method( 'getEntitySourceById' )
 			->with( $entityId )
-			->willReturn( NewEntitySource::havingName( $propertySourceName )->build() );
+			->willReturn( NewDatabaseEntitySource::havingName( $propertySourceName )->build() );
 
 		$this->serviceBySourceAndTypeDispatcher->expects( $this->once() )
 			->method( 'getServiceForSourceAndType' )

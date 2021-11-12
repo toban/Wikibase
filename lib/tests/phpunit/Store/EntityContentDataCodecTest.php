@@ -12,9 +12,9 @@ use Wikibase\DataModel\Entity\EntityId;
 use Wikibase\DataModel\Entity\EntityRedirect;
 use Wikibase\DataModel\Entity\Item;
 use Wikibase\DataModel\Entity\ItemId;
+use Wikibase\DataModel\Entity\NumericPropertyId;
 use Wikibase\DataModel\Entity\Property;
-use Wikibase\DataModel\Entity\PropertyId;
-use Wikibase\DataModel\SerializerFactory;
+use Wikibase\DataModel\Serializers\SerializerFactory;
 use Wikibase\InternalSerialization\DeserializerFactory;
 use Wikibase\Lib\Store\EntityContentDataCodec;
 use Wikibase\Lib\Store\EntityContentTooBigException;
@@ -42,7 +42,7 @@ class EntityContentDataCodecTest extends MediaWikiIntegrationTestCase {
 	}
 
 	public function entityIdProvider() {
-		$p1 = new PropertyId( 'P1' );
+		$p1 = new NumericPropertyId( 'P1' );
 		$q11 = new ItemId( 'Q11' );
 
 		return [

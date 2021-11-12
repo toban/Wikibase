@@ -18,11 +18,11 @@
  */
 
 use MediaWiki\MediaWikiServices;
-use Wikibase\DataAccess\EntitySource;
+use Wikibase\DataAccess\DatabaseEntitySource;
 use Wikibase\DataModel\Entity\EntityDocument;
 use Wikibase\DataModel\Entity\Item;
 use Wikibase\DataModel\Entity\Property;
-use Wikibase\DataModel\SerializerFactory;
+use Wikibase\DataModel\Serializers\SerializerFactory;
 use Wikibase\DataModel\Services\EntityId\EntityIdFormatter;
 use Wikibase\DataModel\Services\Lookup\EntityRetrievingTermLookup;
 use Wikibase\Lib\DataTypeDefinitions;
@@ -272,7 +272,7 @@ return [
 				new StatementEntityReferenceExtractor( WikibaseRepo::getItemUrlParser() )
 			] );
 		},
-		Def::PREFETCHING_TERM_LOOKUP_CALLBACK => function ( EntitySource $entitySource ) {
+		Def::PREFETCHING_TERM_LOOKUP_CALLBACK => function ( DatabaseEntitySource $entitySource ) {
 			$termIdsResolver = WikibaseRepo::getTermInLangIdsResolverFactory()
 				->getResolverForEntitySource( $entitySource );
 
@@ -478,7 +478,7 @@ return [
 		Def::ENTITY_REFERENCE_EXTRACTOR_CALLBACK => function() {
 			return new StatementEntityReferenceExtractor( WikibaseRepo::getItemUrlParser() );
 		},
-		Def::PREFETCHING_TERM_LOOKUP_CALLBACK => function ( EntitySource $entitySource ) {
+		Def::PREFETCHING_TERM_LOOKUP_CALLBACK => function ( DatabaseEntitySource $entitySource ) {
 			$mwServices = MediaWikiServices::getInstance();
 			$entitySourceServices = WikibaseRepo::getSingleEntitySourceServicesFactory( $mwServices )
 				->getServicesForSource( $entitySource );

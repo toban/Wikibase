@@ -11,7 +11,7 @@ use ReflectionMethod;
 use RuntimeException;
 use stdClass;
 use Wikibase\DataModel\ByPropertyIdArray;
-use Wikibase\DataModel\Entity\PropertyId;
+use Wikibase\DataModel\Entity\NumericPropertyId;
 use Wikibase\DataModel\PropertyIdProvider;
 use Wikibase\DataModel\Snak\PropertyNoValueSnak;
 use Wikibase\DataModel\Snak\PropertySomeValueSnak;
@@ -79,11 +79,11 @@ class ByPropertyIdArrayTest extends \PHPUnit\Framework\TestCase {
 		$lists = [];
 
 		$snaks = [
-			new PropertyNoValueSnak( new PropertyId( 'P42' ) ),
-			new PropertySomeValueSnak( new PropertyId( 'P42' ) ),
-			new PropertySomeValueSnak( new PropertyId( 'P10' ) ),
-			new PropertyValueSnak( new PropertyId( 'P10' ), new StringValue( 'ohi' ) ),
-			new PropertySomeValueSnak( new PropertyId( 'P1' ) ),
+			new PropertyNoValueSnak( new NumericPropertyId( 'P42' ) ),
+			new PropertySomeValueSnak( new NumericPropertyId( 'P42' ) ),
+			new PropertySomeValueSnak( new NumericPropertyId( 'P10' ) ),
+			new PropertyValueSnak( new NumericPropertyId( 'P10' ), new StringValue( 'ohi' ) ),
+			new PropertySomeValueSnak( new NumericPropertyId( 'P1' ) ),
 		];
 
 		$lists[] = $snaks;
@@ -109,12 +109,12 @@ class ByPropertyIdArrayTest extends \PHPUnit\Framework\TestCase {
 	 */
 	protected function statementsProvider() {
 		$snaks = [
-			new PropertyNoValueSnak( new PropertyId( 'P1' ) ),
-			new PropertySomeValueSnak( new PropertyId( 'P1' ) ),
-			new PropertyValueSnak( new PropertyId( 'P2' ), new StringValue( 'a' ) ),
-			new PropertyValueSnak( new PropertyId( 'P2' ), new StringValue( 'b' ) ),
-			new PropertyValueSnak( new PropertyId( 'P2' ), new StringValue( 'c' ) ),
-			new PropertySomeValueSnak( new PropertyId( 'P3' ) ),
+			new PropertyNoValueSnak( new NumericPropertyId( 'P1' ) ),
+			new PropertySomeValueSnak( new NumericPropertyId( 'P1' ) ),
+			new PropertyValueSnak( new NumericPropertyId( 'P2' ), new StringValue( 'a' ) ),
+			new PropertyValueSnak( new NumericPropertyId( 'P2' ), new StringValue( 'b' ) ),
+			new PropertyValueSnak( new NumericPropertyId( 'P2' ), new StringValue( 'c' ) ),
+			new PropertySomeValueSnak( new NumericPropertyId( 'P3' ) ),
 		];
 
 		return array_map(
@@ -194,17 +194,15 @@ class ByPropertyIdArrayTest extends \PHPUnit\Framework\TestCase {
 		$removeObject->invokeArgs( $indexedArray, [ $objects[0] ] );
 		$removeObject->invokeArgs( $indexedArray, [ $objects[$lastIndex] ] );
 
-		$this->assertFalse(
-			in_array( $objects[0], $indexedArray->getByPropertyId( $objects[0]->getPropertyId() ) )
+		$this->assertNotContains(
+			$objects[0], $indexedArray->getByPropertyId( $objects[0]->getPropertyId() )
 		);
 
-		$this->assertFalse( in_array(
-			$objects[$lastIndex],
-			$indexedArray->getByPropertyId( $objects[1]->getPropertyId() )
-		) );
+		$this->assertNotContains( $objects[$lastIndex],
+			$indexedArray->getByPropertyId( $objects[1]->getPropertyId() ) );
 
-		$this->assertFalse( in_array( $objects[0], $indexedArray->toFlatArray() ) );
-		$this->assertFalse( in_array( $objects[$lastIndex], $indexedArray->toFlatArray() ) );
+		$this->assertNotContains( $objects[0], $indexedArray->toFlatArray() );
+		$this->assertNotContains( $objects[$lastIndex], $indexedArray->toFlatArray() );
 	}
 
 	public function testGetByNotSetIdThrowsException() {
@@ -213,14 +211,14 @@ class ByPropertyIdArrayTest extends \PHPUnit\Framework\TestCase {
 
 		$this->expectException( OutOfBoundsException::class );
 
-		$indexedArray->getByPropertyId( new PropertyId( 'P9000' ) );
+		$indexedArray->getByPropertyId( new NumericPropertyId( 'P9000' ) );
 	}
 
 	public function testNotBuildExceptionIsThrownForByPropertyId() {
 		$indexedArray = new ByPropertyIdArray();
 
 		$this->expectException( RuntimeException::class );
-		$indexedArray->getByPropertyId( new PropertyId( 'P9000' ) );
+		$indexedArray->getByPropertyId( new NumericPropertyId( 'P9000' ) );
 	}
 
 	public function testNotBuildExceptionIsThrownForGetPropertyIds() {
@@ -345,7 +343,10 @@ class ByPropertyIdArrayTest extends \PHPUnit\Framework\TestCase {
 
 		$this->expectException( OutOfBoundsException::class );
 
-		$indexedArray->moveObjectToIndex( new Statement( new PropertyNoValueSnak( new PropertyId( 'P9999' ) ) ), 0 );
+		$indexedArray->moveObjectToIndex(
+			new Statement( new PropertyNoValueSnak( new NumericPropertyId( 'P9999' ) ) ),
+			0
+		);
 	}
 
 	public function testMoveThrowingOutOfBoundsExceptionOnInvalidIndex() {
